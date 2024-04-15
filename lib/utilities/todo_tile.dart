@@ -1,57 +1,75 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-// ignore: must_be_immutable
 class ToDoTile extends StatelessWidget {
   final String taskName;
   final bool taskCompleted;
-  Function(bool?)? onChanged;
-  Function(BuildContext)? deleteFunction;
+  final Function(bool?)? onChanged;
+  final Function(BuildContext)? deleteFunction;
+  final Function() onPressed;
 
-  ToDoTile(
-      {super.key,
-      required this.taskName,
-      required this.taskCompleted,
-      required this.onChanged,
-      required this.deleteFunction});
+  const ToDoTile({
+    super.key,
+    required this.taskName,
+    required this.taskCompleted,
+    required this.onChanged,
+    required this.deleteFunction,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 25.0, right: 25, top: 25),
-      child: Slidable(
-        endActionPane: ActionPane(motion: StretchMotion(), children: [
-          SlidableAction(
-            onPressed: deleteFunction,
-            icon: Icons.delete,
-            backgroundColor: Colors.red.shade300,
-            borderRadius: BorderRadius.circular(12),
-          )
-        ]),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 6, 17, 79),
-              borderRadius: BorderRadius.circular(12)),
-          child: Row(
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: taskCompleted
+            ? Color.fromARGB(255, 78, 122, 255)
+            : const Color.fromARGB(255, 6, 17, 79),
+        ),
+        child: Slidable(
+          endActionPane: ActionPane(
+            motion: const StretchMotion(),
             children: [
-              // checkbox
-              Checkbox(
+              SlidableAction(
+                onPressed: deleteFunction,
+                icon: Icons.delete,
+                backgroundColor: Colors.red.shade300,
+                borderRadius: BorderRadius.circular(12),
+              )
+            ],
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: taskCompleted
+                  ? const Color.fromARGB(98, 79, 119, 238)
+                  : const Color.fromARGB(255, 6, 17, 79),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                // checkbox
+                Checkbox(
                   value: taskCompleted,
                   onChanged: onChanged,
-                  activeColor: Colors.black),
+                  activeColor: Colors.black,
+                ),
 
-              // task name
-              Text(
-                taskName,
-                style: TextStyle(
+                // task name
+                Text(
+                  taskName,
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     decoration: taskCompleted
                         ? TextDecoration.lineThrough
-                        : TextDecoration.none),
-              ),
-            ],
+                        : TextDecoration.none,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
