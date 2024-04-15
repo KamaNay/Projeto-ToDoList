@@ -13,27 +13,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // reference the hive box
+  // reference to the hive box
   final _myBox = Hive.box('mybox');
   ToDoDataBase db = ToDoDataBase();
 
   @override
   void initState() {
     // first time ever open the app, then create a default data
+    super.initState();
+    // Check if there is initial data, if not, create it
     if (_myBox.get("TODOLIST") == null) {
       db.createInitialData();
     } else {
-      // there already exixts data
+      // there already exits data
       db.loadData();
     }
-
-    super.initState();
   }
 
   // text controller
   final _controller = TextEditingController();
   // list to dodo tasks
 
+  // Checkbox callback
   void checkBoxChanged(bool? value, int index) {
     setState(() {
       db.toDoList[index][1] = !db.toDoList[index][1];
@@ -41,7 +42,7 @@ class _HomePageState extends State<HomePage> {
     db.updateDataBase();
   }
 
-  // save new task
+  // Save new task
   void saveNewTask() {
     setState(() {
       db.toDoList.add([_controller.text, false]);
@@ -49,6 +50,15 @@ class _HomePageState extends State<HomePage> {
     });
     Navigator.of(context).pop();
     db.updateDataBase();
+  }
+
+  // Limit the length of the task
+  String lengthLimit(String task) {
+    if (task.length <= 29) {
+      return task;
+    } else {
+      return '${task.substring(0, 25)}...';
+    }
   }
 
   // creating new task
@@ -73,6 +83,27 @@ class _HomePageState extends State<HomePage> {
     db.updateDataBase();
   }
 
+  // Open task details
+  void openTask(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Tarefa'),
+          content: Text(db.toDoList[index][0]),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Icon(Icons.close, color: Color.fromARGB(255, 6, 17, 79)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +119,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: createNewTask,
-        backgroundColor: Color.fromARGB(255, 6, 17, 79),
+        backgroundColor: const Color.fromARGB(255, 6, 17, 79),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -96,7 +127,8 @@ class _HomePageState extends State<HomePage> {
         itemCount: db.toDoList.length,
         itemBuilder: (context, index) {
           return ToDoTile(
-            taskName: db.toDoList[index][0],
+            onPressed: () => openTask(index),
+            taskName: lengthLimit(db.toDoList[index][0]),
             taskCompleted: db.toDoList[index][1],
             onChanged: (value) => checkBoxChanged(value, index),
             deleteFunction: (context) => deleteTask(index),
