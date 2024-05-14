@@ -21,13 +21,8 @@ class ToDoTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 25.0, right: 25, top: 25),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: taskCompleted
-            ? Color.fromARGB(255, 78, 122, 255)
-            : const Color.fromARGB(255, 6, 17, 79),
-        ),
+      child: GestureDetector(
+        onTap: onPressed,
         child: Slidable(
           endActionPane: ActionPane(
             motion: const StretchMotion(),
